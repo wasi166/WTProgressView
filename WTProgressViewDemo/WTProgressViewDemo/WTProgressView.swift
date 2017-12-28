@@ -27,6 +27,7 @@ class WTProgressView: UIView , CAAnimationDelegate {
         self.fillColor = fillColor
         self.value = value
         self.hasIndicatorBar = hasIndicatorBar
+        self.backgroundColor = UIColor.clear
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -39,39 +40,41 @@ class WTProgressView: UIView , CAAnimationDelegate {
     override func draw(_ rect: CGRect) {
         // Drawing code
         super.draw(rect)
+     
+        self.layer.sublayers = nil
+        
         path.move(to: CGPoint(x: 0, y: 3))
         path.addLine(to: CGPoint(x: getPercentValue(), y: 3))
         
         drawShapeLayer()
     }
     
-    func fillTo(value : CGFloat)
+    private func fillTo(value : CGFloat)
     {
         self.value = value
         
         self.layer.sublayers = []
         
         path.move(to: CGPoint(x: 0, y: 3))
-        path.addLine(to: CGPoint(x: getPercentValue(), y: self.frame.height - 3))
+        path.addLine(to: CGPoint(x: getPercentValue(), y: 3))
         
         drawShapeLayer()
     }
     
     func animateTo(value : CGFloat , duration : CGFloat)
     {
+        self.animated = true
         self.value = value
-        drawShapeLayer()
-        
+        self.layer.sublayers = nil
+      
+        draw(self.frame)
         fillLayer?.strokeEnd = 0
         animate(duration: duration)
     }
     
     private func drawShapeLayer()
     {
-        if fillLayer != nil
-        {
-            fillLayer?.removeFromSuperlayer()
-        }
+        self.layer.sublayers = []
         
         fillLayer = CAShapeLayer()
         fillLayer?.path = path.cgPath
@@ -86,9 +89,7 @@ class WTProgressView: UIView , CAAnimationDelegate {
             drawBar()
         }
      
-        
-        setNeedsDisplay()
-    }
+}
     
     private func getPercentValue() -> CGFloat
     {
@@ -114,28 +115,28 @@ class WTProgressView: UIView , CAAnimationDelegate {
     
     private func animate(duration : CGFloat)
     {
-        fillLayer?.strokeEnd = 0
-        
         let animation = CABasicAnimation(keyPath: "strokeEnd")
+        
         animation.duration = CFTimeInterval(duration)
+        animation.fromValue = 0
         animation.toValue = 1
         animation.fillMode = kCAFillModeForwards
         animation.isRemovedOnCompletion = false
         animation.delegate = self
         
         fillLayer?.add(animation, forKey: "animation")
-        
     }
    
     
     //MARK: - CAAnimation delegate methods
     
     func animationDidStop(_ anim: CAAnimation, finished flag: Bool) {
-    
         if flag
         {
+            print("animation ended")
             drawBar()
         }
     }
+    
     
 }
