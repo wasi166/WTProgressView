@@ -6,6 +6,7 @@ just initialize this view and add it to your view
 
 # Adding To a View
 let progressView = WTProgressView(frame: CGRect(x: 50 , y: 50 , width : 200 , height : 10), fillColor: UIColor.red, value: 50, hasIndicatorBar: true)
+
 yourSuperView.addSubView(progressView)
 
 # Animating to desired value
